@@ -1,0 +1,117 @@
+/*
+===============================================================================
+Stored Procedure: Load Bronze Layer (Source -> Bronze)
+===============================================================================
+Script Purpose:
+    This stored procedure loads data into the 'bronze' schema from external CSV files. 
+    It performs the following actions:
+    - Truncates the bronze tables before loading data.
+    - Uses the `COPY` command to load data from csv Files to bronze tables.
+
+Parameters:
+    None. 
+	  This stored procedure does not accept any parameters or return any values.
+
+Usage Example:
+    CALL bronze.load_bronze();
+===============================================================================
+*/
+
+CREATE OR REPLACE PROCEDURE bronze.load_bronze()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_msg text;
+    v_detail text;
+    v_hint text;
+BEGIN
+	v_start_time := clock_timestamp();
+    RAISE NOTICE '=============================================';
+    RAISE NOTICE 'Loading Bronze Layer';
+    RAISE NOTICE '=============================================';
+
+    BEGIN
+        RAISE NOTICE '---------------------------------------------';
+        RAISE NOTICE 'Loading CRM Tables';
+        RAISE NOTICE '---------------------------------------------';
+
+        TRUNCATE TABLE bronze.crm_cust_info;
+        COPY bronze.crm_cust_info
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+        TRUNCATE TABLE bronze.crm_prd_info;
+        COPY bronze.crm_prd_info
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+        TRUNCATE TABLE bronze.crm_sales_details;
+        COPY bronze.crm_sales_details
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS
+                v_msg = MESSAGE_TEXT,
+                v_detail = PG_EXCEPTION_DETAIL,
+                v_hint = PG_EXCEPTION_HINT;
+
+			RAISE NOTICE '=============================================';
+            RAISE NOTICE 'CRM load failed';
+            RAISE NOTICE 'SQLSTATE: %', SQLSTATE;
+            RAISE NOTICE 'Message: %', v_msg;
+            RAISE NOTICE 'Detail: %', COALESCE(v_detail, 'none');
+            RAISE NOTICE 'Hint: %', COALESCE(v_hint, 'none');
+            RAISE NOTICE 'Start time: %', v_start_time;
+            RAISE NOTICE 'Error time: %', v_end_time;
+            RAISE NOTICE 'Elapsed time before failure: %', v_duration;
+            RAISE NOTICE '=============================================';
+
+            RAISE EXCEPTION 'CRM load failed. SQLSTATE: %, Message: %, Detail: %, Hint: %',
+                SQLSTATE, v_msg, COALESCE(v_detail, 'none'), COALESCE(v_hint, 'none');
+    END;
+
+    BEGIN
+        RAISE NOTICE '---------------------------------------------';
+        RAISE NOTICE 'Loading ERP Tables';
+        RAISE NOTICE '---------------------------------------------';
+
+        TRUNCATE TABLE bronze.erp_loc_a101;
+        COPY bronze.erp_loc_a101
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_erp\LOC_A101.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+        TRUNCATE TABLE bronze.erp_cust_az12;
+        COPY bronze.erp_cust_az12
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_erp\CUST_AZ12.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+        TRUNCATE TABLE bronze.erp_px_cat_g1v2;
+        COPY bronze.erp_px_cat_g1v2
+        FROM 'C:\School\coding\SQL\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',');
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS
+                v_msg = MESSAGE_TEXT,
+                v_detail = PG_EXCEPTION_DETAIL,
+                v_hint = PG_EXCEPTION_HINT;
+
+			RAISE NOTICE '=============================================';
+            RAISE NOTICE 'ERP load failed';
+            RAISE NOTICE 'SQLSTATE: %', SQLSTATE;
+            RAISE NOTICE 'Message: %', v_msg;
+            RAISE NOTICE 'Detail: %', COALESCE(v_detail, 'none');
+            RAISE NOTICE 'Hint: %', COALESCE(v_hint, 'none');
+            RAISE NOTICE 'Start time: %', v_start_time;
+            RAISE NOTICE 'Error time: %', v_end_time;
+            RAISE NOTICE 'Elapsed time before failure: %', v_duration;
+            RAISE NOTICE '=============================================';
+
+            RAISE EXCEPTION 'ERP load failed. SQLSTATE: %, Message: %, Detail: %, Hint: %',
+                SQLSTATE, v_msg, COALESCE(v_detail, 'none'), COALESCE(v_hint, 'none');
+    END;
+
+    RAISE NOTICE 'Bronze load completed successfully.';
+END;
+$$;
