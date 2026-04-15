@@ -4,7 +4,7 @@
 Welcome to the **Data Warehouse and Analytics Project** repository! 🚀  
 This project builds a data warehouse in PostgreSQL using Medallion Architecture (Bronze/Silver/Gold layers), consolidating ERP and CRM sales data into a star schema optimised for analytical queries. Includes ETL pipelines, data quality checks, and SQL-based reporting across customer behaviour, product performance, and sales trends. For more details, refer to [docs/data_catalog.md](docs/data_catalog.md).
 
-![Star Schema](docs/data_models.png)
+![Star Schema](docs/data_model.png)
 
 ---
 ## Data Architecture
@@ -64,7 +64,7 @@ data-warehouse-project/
 │   ├── data_architecture.png           # Picture shows the project's architecture
 │   ├── data_catalog.md                 # Catalog of datasets, including field descriptions and metadata
 │   ├── data_flow.png                   # Picture for the data flow diagram
-│   ├── data_models.png                 # Picture for data models (star schema)
+│   ├── data_model.png                  # Picture for data models (star schema)
 │   ├── naming-conventions.md           # Consistent naming guidelines for tables, columns, and files
 │
 ├── scripts/                            # SQL scripts for ETL and transformations
