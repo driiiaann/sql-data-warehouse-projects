@@ -14,10 +14,6 @@ Usage:
 ===============================================================================
 */
 
--- =============================================================================
--- Create Dimension: gold.dim_customers
--- =============================================================================
-
 CREATE OR REPLACE PROCEDURE gold.load_gold()
 LANGUAGE plpgsql
 AS $$
@@ -37,6 +33,14 @@ BEGIN
     RAISE NOTICE '=============================================';
 
     BEGIN
+        ----------------------------------------------------------------------
+        -- Drop existing views (order matters due to dependencies)
+        ----------------------------------------------------------------------
+        RAISE NOTICE '>> Dropping existing views';
+        DROP VIEW IF EXISTS gold.fact_sales;
+        DROP VIEW IF EXISTS gold.dim_products;
+        DROP VIEW IF EXISTS gold.dim_customers;
+
         RAISE NOTICE '---------------------------------------------';
         RAISE NOTICE 'Creating Dimension Views';
         RAISE NOTICE '---------------------------------------------';
@@ -45,9 +49,9 @@ BEGIN
         -- Create Dimension: gold.dim_customers
         ----------------------------------------------------------------------
         RAISE NOTICE '>> Creating View: gold.dim_customers';
-        CREATE OR REPLACE VIEW gold.dim_customers AS
+        CREATE VIEW gold.dim_customers AS
         SELECT
-            ROW_NUMBER() OVER (ORDER BY cci.cst_id) AS customer_key,   -- surrogate key
+            ROW_NUMBER() OVER (ORDER BY cci.cst_id) AS customer_key,
             cci.cst_id                  AS customer_id,
             cci.cst_key                 AS customer_number,
             cci.cst_firstname           AS first_name,
@@ -57,93 +61,82 @@ BEGIN
             CASE
                 WHEN cci.cst_gndr <> 'N/A' THEN cci.cst_gndr
                 ELSE COALESCE(eca.gen, 'N/A')
-            END                        AS gender,
-            eca.bdate                  AS birthdate,
-            cci.cst_create_date        AS create_date
-        FROM silver.crm_cust_info     cci
-        LEFT JOIN silver.erp_cust_az12 eca
-               ON cci.cst_key = eca.cid
-        LEFT JOIN silver.erp_loc_a101 ela
-               ON cci.cst_key = ela.cid;
+            END                         AS gender,
+            eca.bdate                   AS birthdate,
+            cci.cst_create_date         AS create_date
+        FROM silver.crm_cust_info cci
+        LEFT JOIN silver.erp_cust_az12 eca ON cci.cst_key = eca.cid
+        LEFT JOIN silver.erp_loc_a101  ela ON cci.cst_key = ela.cid;
 
         ----------------------------------------------------------------------
         -- Create Dimension: gold.dim_products
         ----------------------------------------------------------------------
         RAISE NOTICE '>> Creating View: gold.dim_products';
-        CREATE OR REPLACE VIEW gold.dim_products AS
+        CREATE VIEW gold.dim_products AS
         SELECT
             ROW_NUMBER() OVER (
                 ORDER BY cpi.prd_start_dt, cpi.prd_key
-            )                           AS product_key,   -- surrogate key
-            cpi.prd_id                  AS product_id,
-            cpi.prd_key                 AS product_number,
-            cpi.prd_nm                  AS product_name,
-            cpi.cat_id                  AS category_id,
-            epcgv.cat                   AS category,
-            epcgv.subcat                AS subcategory,
-            epcgv.maintenance           AS maintenance,
-            cpi.prd_cost                AS cost,
-            cpi.prd_line                AS product_line,
-            cpi.prd_start_dt            AS start_date
-        FROM silver.crm_prd_info       cpi
-        LEFT JOIN silver.erp_px_cat_g1v2 epcgv
-               ON cpi.cat_id = epcgv.id
+            )                               AS product_key,
+            cpi.prd_id                      AS product_id,
+            cpi.prd_key                     AS product_number,
+            cpi.prd_nm                      AS product_name,
+            cpi.cat_id                      AS category_id,
+            CAST(epcgv.cat AS VARCHAR)      AS category,
+            CAST(epcgv.subcat AS VARCHAR)   AS subcategory,
+            CAST(epcgv.maintenance AS VARCHAR) AS maintenance,
+            cpi.prd_cost                    AS cost,
+            cpi.prd_line                    AS product_line,
+            cpi.prd_start_dt                AS start_date
+        FROM silver.crm_prd_info cpi
+        LEFT JOIN silver.erp_px_cat_g1v2 epcgv ON cpi.cat_id = epcgv.id
         WHERE cpi.prd_end_dt IS NULL;
 
         ----------------------------------------------------------------------
         -- Create Fact: gold.fact_sales
         ----------------------------------------------------------------------
         RAISE NOTICE '>> Creating View: gold.fact_sales';
-        CREATE OR REPLACE VIEW gold.fact_sales AS
+        CREATE VIEW gold.fact_sales AS
         SELECT
-            csd.sls_ord_num         AS order_number,
-            gp.product_key          AS product_key,
-            gc.customer_key         AS customer_key,
-            csd.sls_order_dt        AS order_date,
-            csd.sls_ship_dt         AS shipping_date,
-            csd.sls_due_dt          AS due_date,
-            csd.sls_sales           AS sales,
-            csd.sls_quantity        AS quantity,
-            csd.sls_price           AS price
+            csd.sls_ord_num     AS order_number,
+            gp.product_key      AS product_key,
+            gc.customer_key     AS customer_key,
+            csd.sls_order_dt    AS order_date,
+            csd.sls_ship_dt     AS shipping_date,
+            csd.sls_due_dt      AS due_date,
+            csd.sls_sales       AS sales,
+            csd.sls_quantity    AS quantity,
+            csd.sls_price       AS price
         FROM silver.crm_sales_details csd
-        LEFT JOIN gold.dim_products  gp
-               ON csd.sls_prd_key = gp.product_number
-        LEFT JOIN gold.dim_customers gc
-               ON csd.sls_cust_id = gc.customer_id;
+        LEFT JOIN gold.dim_products  gp ON csd.sls_prd_key = gp.product_number
+        LEFT JOIN gold.dim_customers gc ON csd.sls_cust_id = gc.customer_id;
 
     EXCEPTION
         WHEN OTHERS THEN
             v_end_time := clock_timestamp();
             v_duration := v_end_time - v_start_time;
-
             GET STACKED DIAGNOSTICS
-                v_msg = MESSAGE_TEXT,
+                v_msg    = MESSAGE_TEXT,
                 v_detail = PG_EXCEPTION_DETAIL,
-                v_hint = PG_EXCEPTION_HINT;
-
+                v_hint   = PG_EXCEPTION_HINT;
             RAISE NOTICE '=============================================';
-            RAISE NOTICE 'Gold layer load failed (view creation)';
+            RAISE NOTICE 'Gold layer load failed';
             RAISE NOTICE 'SQLSTATE: %', SQLSTATE;
             RAISE NOTICE 'Message: %', v_msg;
             RAISE NOTICE 'Detail: %', COALESCE(v_detail, 'none');
             RAISE NOTICE 'Hint: %', COALESCE(v_hint, 'none');
-            RAISE NOTICE 'Start time: %', v_start_time;
-            RAISE NOTICE 'Error time: %', v_end_time;
             RAISE NOTICE 'Elapsed time before failure: %', v_duration;
             RAISE NOTICE '=============================================';
-
             RAISE EXCEPTION 'Gold layer load failed. SQLSTATE: %, Message: %, Detail: %, Hint: %',
                 SQLSTATE, v_msg, COALESCE(v_detail, 'none'), COALESCE(v_hint, 'none');
     END;
 
     v_end_time := clock_timestamp();
     v_duration := v_end_time - v_start_time;
-
     RAISE NOTICE '=============================================';
-    RAISE NOTICE 'Gold load completed successfully (views created).';
-    RAISE NOTICE 'Start time: %', v_start_time;
-    RAISE NOTICE 'End time: %', v_end_time;
+    RAISE NOTICE 'Gold load completed successfully.';
     RAISE NOTICE 'Total duration: %', v_duration;
     RAISE NOTICE '=============================================';
 END;
 $$;
+
+CALL gold.load_gold();
