@@ -2,7 +2,7 @@
 # Data Warehouse and Analytics Project
 
 Welcome to the **Data Warehouse and Analytics Project** repository! 🚀  
-This project builds a data warehouse in PostgreSQL using Medallion Architecture (Bronze/Silver/Gold layers), consolidating ERP and CRM sales data into a star schema optimised for analytical queries. Includes ETL pipelines, data quality checks, and SQL-based reporting across customer behaviour, product performance, and sales trends. For more details, refer to [docs/data_catalog.md](docs/data_catalog.md).
+This project builds a modern data warehouse in PostgreSQL using Medallion Architecture (**Bronze / Silver / Gold**) and delivers a **Power BI dashboard** for sales analytics. It consolidates ERP and CRM sales data into a star schema optimized for analytical queries, with ETL pipelines, data quality checks, and SQL-based reporting across customer behaviour, product performance, and sales trends.
 
 ![Star Schema](docs/data_model.png)
 
@@ -41,15 +41,28 @@ Develop a modern data warehouse using PostgreSQL to consolidate sales data, enab
 
 ---
 
-### BI: Analytics & Reporting (Data Analysis)
+## 📊 Power BI Dashboard
 
-#### Objective
-Develop SQL-based analytics to deliver detailed insights into:
-- **Customer Behavior**
-- **Product Performance**
-- **Sales Trends**
+This project includes a 3-page Power BI dashboard built on top of the Gold layer star schema to support business reporting and decision-making.
 
-These insights empower stakeholders with key business metrics, enabling strategic decision-making.  
+### Dashboard Pages
+- **Sales Overview**: High-level KPIs, revenue trends, and top-performing products.
+- **Customer Insights**: Customer distribution by gender, marital status, and country, along with top customers by revenue.
+- **Product Insights**: Product performance by revenue, category, subcategory, and product line.
+
+### Dashboard Preview
+
+#### Sales Overview
+![Sales Overview](docs/sales_overview.png)
+
+#### Customer Insights
+![Customer Insights](docs/customer_insights.png)
+
+#### Product Insights
+![Product Insights](docs/product_insights.png)
+
+### Power BI File
+- `power_bi/sales_dashboard.pbix`
 
 For more details, refer to [requirements.md](requirements.md).
 
@@ -57,26 +70,26 @@ For more details, refer to [requirements.md](requirements.md).
 ```
 data-warehouse-project/
 │
-├── datasets/                           # Raw datasets used for the project (ERP and CRM data)
+├── datasets/                           # Raw datasets used for the project (ERP and CRM source files
 │
 ├── docs/                               # Project documentation and architecture details
-│   ├── etl_flow.png                    # Picture shows all different techniquies and methods of ETL
+│   ├── etl_flow.png                    # Picture shows all different techniques and methods of ETL
 │   ├── data_architecture.png           # Picture shows the project's architecture
 │   ├── data_catalog.md                 # Catalog of datasets, including field descriptions and metadata
 │   ├── data_flow.png                   # Picture for the data flow diagram
 │   ├── data_model.png                  # Picture for data models (star schema)
 │   ├── naming-conventions.md           # Consistent naming guidelines for tables, columns, and files
+│   ├── customer_insights.png/          # Picture of customer insights              
+│   ├── product_insights.png            # Picture of product insights
+│   ├── sales_overview.png/             # Picture of sales overview
 │
 ├── scripts/                            # SQL scripts for ETL and transformations
 │   ├── bronze/                         # Scripts for extracting and loading raw data
 │   ├── silver/                         # Scripts for cleaning and transforming data
 │   ├── gold/                           # Scripts for creating analytical models
 │
-├── power_bi/
-│   ├── sales_dashboard.pbtx                                
-│   ├── customer_insights.png/                         
-│   ├── product_insights.png                        
-│   ├── sales_overview.png/
+├── power_bi/                           # Power BI dashboard files
+│   ├── sales_dashboard.pbtx            # Main Power BI dashboard                    
 |    
 ├── tests/                              # Test scripts and quality files
 │
