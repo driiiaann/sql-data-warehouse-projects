@@ -43,7 +43,7 @@ Develop a modern data warehouse using PostgreSQL to consolidate sales data, enab
 
 ## 📊 Power BI Dashboard
 
-This project includes a 3-page Power BI dashboard built on top of the Gold layer star schema to support business reporting and decision-making.
+This project includes a 3-page Power BI dashboard built on top of the Gold layer star schema to support business reporting and decision-making. For more details, refer to [requirements.md](requirements.md).
 
 ### Dashboard Pages
 - **Sales Overview**: High-level KPIs, revenue trends, and top-performing products.
@@ -60,11 +60,6 @@ This project includes a 3-page Power BI dashboard built on top of the Gold layer
 
 #### Product Insights
 ![Product Insights](docs/product_insights.png)
-
-### Power BI File
-- `power_bi/sales_dashboard.pbix`
-
-For more details, refer to [requirements.md](requirements.md).
 
 ## 📂 Repository Structure
 ```
