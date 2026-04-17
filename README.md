@@ -72,6 +72,12 @@ data-warehouse-project/
 │   ├── silver/                         # Scripts for cleaning and transforming data
 │   ├── gold/                           # Scripts for creating analytical models
 │
+├── power_bi/
+│   ├── sales_dashboard.pbtx                                
+│   ├── customer_insights.png/                         
+│   ├── product_insights.png                        
+│   ├── sales_overview.png/
+|    
 ├── tests/                              # Test scripts and quality files
 │
 ├── README.md                           # Project overview and instructions
