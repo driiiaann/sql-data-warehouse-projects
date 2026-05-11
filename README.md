@@ -2,7 +2,7 @@
 # Data Warehouse and Analytics Project
 
 Welcome to the **Data Warehouse and Analytics Project** repository! 🚀  
-This project builds a modern data warehouse in PostgreSQL using Medallion Architecture (**Bronze / Silver / Gold**) and delivers a **Power BI dashboard** for sales analytics. It consolidates ERP and CRM sales data into a star schema optimized for analytical queries, with ETL pipelines, data quality checks, and SQL-based reporting across customer behaviour, product performance, and sales trends.
+This project builds a modern data warehouse in PostgreSQL using Medallion Architecture (**Bronze / Silver / Gold**) and delivers a **Power BI dashboard** for sales analytics. It consolidates ERP and CRM sales data into a star schema optimized for analytical queries, with ELT pipelines, data quality checks, and SQL-based reporting across customer behaviour, product performance, and sales trends.
 
 ![Star Schema](docs/data_model.png)
 
@@ -53,13 +53,11 @@ This project includes a 3-page Power BI dashboard built on top of the Gold layer
 ### Dashboard Preview
 
 #### Sales Overview
-![Sales Overview](docs/sales_overview.png)
 
 #### Customer Insights
-![Customer Insights](docs/customer_insights.png)
 
 #### Product Insights
-![Product Insights](docs/product_insights.png)
+
 
 ## 📂 Repository Structure
 ```
