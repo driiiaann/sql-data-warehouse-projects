@@ -72,9 +72,6 @@ data-warehouse-project/
 │   ├── data_flow.png                   # Picture for the data flow diagram
 │   ├── data_model.png                  # Picture for data models (star schema)
 │   ├── naming-conventions.md           # Consistent naming guidelines for tables, columns, and files
-│   ├── customer_insights.png/          # Picture of customer insights              
-│   ├── product_insights.png            # Picture of product insights
-│   ├── sales_overview.png/             # Picture of sales overview
 │
 ├── scripts/                            # SQL scripts for ETL and transformations
 │   ├── bronze/                         # Scripts for extracting and loading raw data
@@ -82,7 +79,10 @@ data-warehouse-project/
 │   ├── gold/                           # Scripts for creating analytical models
 │
 ├── power_bi/                           # Power BI dashboard files
-│   ├── sales_dashboard.pbtx            # Main Power BI dashboard                    
+│   ├── sales_dashboard.pbtx            # Main Power BI dashboard
+│   ├── customer_overview.png/          # Picture of customer insights              
+│   ├── product_overview.png            # Picture of product insights
+│   ├── sales_overview.png/             # Picture of sales overview                    
 |    
 ├── tests/                              # Test scripts and quality files
 │
