@@ -53,11 +53,11 @@ This project includes a 3-page Power BI dashboard built on top of the Gold layer
 ### Dashboard Preview
 
 #### Sales Overview
-
+![Sales Overview](power_bi/sales_overview.png)
 #### Customer Insights
-
+![Customer Insights](power_bi/customer_overview.png)
 #### Product Insights
-
+![Product Insights](power_bi/product_overview.png)
 
 ## 📂 Repository Structure
 ```
